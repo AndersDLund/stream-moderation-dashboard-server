@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 6000;
 
 //middleware
 app.use(cors());
@@ -13,9 +13,11 @@ app.use(bodyParser.json());
 
 //routes
 const moderationRouter = require('./routes/moderation');
-
 app.use('/moderation', moderationRouter);
 
 app.listen(port, () => {
     console.log(`server running on port ${port}`);
 })
+
+
+//kill -9 $(sudo lsof -t -i:7200)
