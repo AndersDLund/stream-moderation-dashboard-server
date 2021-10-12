@@ -1,6 +1,8 @@
 const router = require('express').Router();
 
 const StreamChat = require('stream-chat').StreamChat;
+const Sentiment = require('sentiment');
+
 const chatClient = StreamChat.getInstance(process.env.API_KEY, process.env.API_SECRET);
 const admin = "Ryan";
 
@@ -113,5 +115,11 @@ router.route('/message/delete').post(async(req, res) => {
 router.route('/message/unflag').post((req, res) => {
 
 });
+
+router.route('/sentiment').post((req, res) => {
+    const sentiment = new Sentiment();
+    const result = sentiment.analyze(req.body.text);
+    res.status(200).send(JSON.stringify(result));
+})
 
 module.exports = router;
