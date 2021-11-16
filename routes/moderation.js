@@ -11,8 +11,7 @@ router.route('/flagged').post((req, res) => {
     chatClient.queryMessageFlags(filter, options).then((flaggedMessages) => {
         res.status(200).send(JSON.stringify(flaggedMessages.flags));
     }).catch((err) => {
-        console.log(err)
-        res.status(401).send(`[ERROR]: ${err}`);
+        res.status(err.response.data.StatusCode).send(`[ERROR]: ${err}`);
     });
 });
 
