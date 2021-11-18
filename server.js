@@ -18,7 +18,7 @@ const moderationRouter = require('./routes/moderation');
 app.use('/moderation', moderationRouter);
 
 app.post("/webhook", (req, res) => {
-    console.log(req);
+    console.log(req.body);
     let body = '';
 
     req.on('data', (chunk) => {
