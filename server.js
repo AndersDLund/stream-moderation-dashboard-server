@@ -18,25 +18,35 @@ const moderationRouter = require('./routes/moderation');
 app.use('/moderation', moderationRouter);
 
 app.post("/webhook", (req, res) => {
-    console.log(req.body);
-    let body = '';
+    if (req.body.type === 'message.flagged') {
+        console.log('WOOOHOOOOO');
 
-    req.on('data', (chunk) => {
-        body += chunk;
-    });
+        chatClient.sendUserCustomEvent('admin', {
+            type: 'flagged_message',
+            content: JSON.stringify(parsedBody),
+        });
+    }
 
-    req.on('end', () => {
-        let parsedBody = JSON.parse(body);
-        console.log(parsedBody);
-        if (parsedBody.type === 'message.flagged') {
-            console.log('FLAGGED!!!!!!!!');
-            chatClient.sendUserCustomEvent('admin', {
-                type: 'flagged_message',
-                content: JSON.stringify(parsedBody),
-            });
-        }
-        res.status(200).send('OK');
-    })
+    // console.log(req.body);
+    // let body = '';
+
+    // req.on('data', (chunk) => {
+    //     body += chunk;
+    // });
+
+    // req.on('end', () => {
+    //     let parsedBody = JSON.parse(body);
+    //     console.log(parsedBody);
+    //     if (parsedBody.type === 'message.flagged') {
+    //         console.log('FLAGGED!!!!!!!!');
+    //         chatClient.sendUserCustomEvent('admin', {
+    //             type: 'flagged_message',
+    //             content: JSON.stringify(parsedBody),
+    //         });
+    //     }
+    //     res.status(200).send('OK');
+    // })
+    res.status(200).send('OK');
 })
 
 app.listen(port, () => {
