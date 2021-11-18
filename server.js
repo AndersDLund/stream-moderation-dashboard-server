@@ -18,6 +18,3 @@ app.use('/moderation', moderationRouter);
 app.listen(port, () => {
     console.log(`server running on port ${port}`);
 })
-
-
-//kill -9 $(sudo lsof -t -i:7200)

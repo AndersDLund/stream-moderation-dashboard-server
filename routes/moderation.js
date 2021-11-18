@@ -21,7 +21,6 @@ router.route('/flagged').post((req, res) => {
 router.route('/user/ban').post(async(req, res) => {
     const user_id  = req.body.userID;
     const size = user_id.length
-    console.log(user_id)
     try {
       if(size === 1) {
         let banUserRes = await chatClient.banUser(user_id[0], { 
@@ -32,7 +31,6 @@ router.route('/user/ban').post(async(req, res) => {
       else{
         let newArray = user_id.map(function(element){
            chatClient.banUser(element, { banned_by_id: admin, reason: 'Unruly Behavior', });
-           console.log(element)
         });
         console.log(newArray[0])
       }       
