@@ -19,12 +19,13 @@ app.use('/moderation', moderationRouter);
 
 app.post("/webhook", (req, res) => {
     if (req.body.type === 'message.flagged') {
-        console.log('WOOOHOOOOO');
 
         chatClient.sendUserCustomEvent('admin', {
             type: 'flagged_message',
             content: JSON.stringify(req.body),
-        });
+        }).then((res) => {
+            console.log(res, 'EVENT SENT');
+        })
     }
 
     // console.log(req.body);
