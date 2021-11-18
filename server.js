@@ -30,7 +30,9 @@ app.post("/webhook", (req, res) => {
             chatClient.sendUserCustomEvent('admin', {
                 type: 'flagged_message',
                 content: JSON.stringify(parsedBody),
-            });
+            }).then((res) => {
+                console.log(res, 'EVENT SENT');
+            })
         }
     })
     res.status(200).send('OK');
