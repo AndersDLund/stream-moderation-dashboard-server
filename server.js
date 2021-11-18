@@ -27,12 +27,11 @@ app.post("/webhook", (req, res) => {
     req.on('end', () => {
         let parsedBody = JSON.parse(body);
         if (parsedBody.type === 'message.flagged') {
+            console.log('FLAGGED!!!!!!!!');
             chatClient.sendUserCustomEvent('admin', {
                 type: 'flagged_message',
                 content: JSON.stringify(parsedBody),
-            }).then((res) => {
-                console.log(res, 'EVENT SENT');
-            })
+            });
         }
     })
     res.status(200).send('OK');
