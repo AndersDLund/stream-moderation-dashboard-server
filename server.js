@@ -27,26 +27,6 @@ app.post("/webhook", (req, res) => {
             console.log(res, 'EVENT SENT');
         })
     }
-
-    // console.log(req.body);
-    // let body = '';
-
-    // req.on('data', (chunk) => {
-    //     body += chunk;
-    // });
-
-    // req.on('end', () => {
-    //     let parsedBody = JSON.parse(body);
-    //     console.log(parsedBody);
-    //     if (parsedBody.type === 'message.flagged') {
-    //         console.log('FLAGGED!!!!!!!!');
-    //         chatClient.sendUserCustomEvent('admin', {
-    //             type: 'flagged_message',
-    //             content: JSON.stringify(parsedBody),
-    //         });
-    //     }
-    //     res.status(200).send('OK');
-    // })
     res.status(200).send('OK');
 })
 
