@@ -1,8 +1,8 @@
-const router = require('express').Router();
 
-const StreamChat = require('stream-chat').StreamChat;
+const router = require('express').Router();
 const Sentiment = require('sentiment');
 
+const StreamChat = require('stream-chat').StreamChat;
 const chatClient = StreamChat.getInstance(process.env.API_KEY, process.env.API_SECRET);
 const admin = "Ryan";
 
@@ -148,7 +148,8 @@ router.route('/message/delete').post(async(req, res) => {
       res.status(200).json({
         payload: "Deleted message(s) with ID(s): " + message_id,
       });
-      } catch (error) {
+      }
+      catch (error) {
         res.status(401).send(`[ERROR]: ${error}`);
       }
 });
@@ -158,9 +159,9 @@ router.route('/message/unflag').post((req, res) => {
 });
 
 router.route('/sentiment').post((req, res) => {
-    const sentiment = new Sentiment();
-    const result = sentiment.analyze(req.body.text);
-    res.status(200).send(JSON.stringify(result));
+  const sentiment = new Sentiment();
+  const result = sentiment.analyze(req.body.text);
+  res.status(200).send(JSON.stringify(result));
 })
 
 module.exports = router;
