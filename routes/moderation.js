@@ -128,12 +128,10 @@ router.route('/message/delete').post(async (req, res) => {
   try {
     if (size === 1) {
       let deletedMsgRes = await chatClient.deleteMessage(message_id, true);
-      // console.log(del)
     }
     else {
       let newArray = message_id.map(function (element) {
         chatClient.deleteMessage(element, true);
-        // console.log(new)
       });
     }
     res.status(200).json({
