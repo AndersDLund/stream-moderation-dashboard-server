@@ -122,23 +122,35 @@ router.route('/user/deleteUserAndMessages').post(async (req, res) => {
 
 // Message Actions
 router.route('/message/delete').post(async (req, res) => {
-  const message_id = req.body.messageID;
-  const size = message_id.length
-  console.log(message_id)
+  const message_body = req.body.messageID;
+  const size = message_body.length
+  const message_id = message_body[0].message.id
+  console.log(req.body.messageID[0])  
   try {
     if (size === 1) {
       let deletedMsgRes = await chatClient.deleteMessage(message_id, true);
+      console.log('1')
     }
     else {
       let newArray = message_id.map(function (element) {
         chatClient.deleteMessage(element, true);
+        console.log('yes2')
       });
     }
     res.status(200).json({
       payload: "Deleted message(s) with ID(s): " + message_id,
     });
   } catch (error) {
+    // const iEM2 = "DeleteMessage failed with error"
+    const iEM = "doesn't exist"
+    const APIErrorMessage = error.response.data.message
+    if (APIErrorMessage.indexOf(iEM) >= 0) { 
+        res.status(200).send('This message has already been deleted')
+        return
+     }
     res.status(401).send(`[ERROR]: ${error}`);
+    
+    console.log(error.response.data.message)
   }
 });
 
