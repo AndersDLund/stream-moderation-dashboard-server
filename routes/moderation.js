@@ -125,16 +125,13 @@ router.route('/message/delete').post(async (req, res) => {
   const message_body = req.body.messageID;
   const size = message_body.length
   const message_id = message_body[0].message.id
-  console.log(req.body.messageID[0])  
   try {
     if (size === 1) {
       let deletedMsgRes = await chatClient.deleteMessage(message_id, true);
-      console.log('1')
     }
     else {
       let newArray = message_id.map(function (element) {
         chatClient.deleteMessage(element, true);
-        console.log('yes2')
       });
     }
     res.status(200).json({
