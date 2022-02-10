@@ -4,7 +4,6 @@ const Sentiment = require('sentiment');
 
 const StreamChat = require('stream-chat').StreamChat;
 const chatClient = StreamChat.getInstance(process.env.API_KEY, process.env.API_SECRET);
-const admin = "Ryan";
 
 router.route('/flagged').post((req, res) => {
   const { filter, options } = req.body;
@@ -16,143 +15,101 @@ router.route('/flagged').post((req, res) => {
   });
 });
 
-
 // User Actions
 router.route('/user/ban').post(async (req, res) => {
-  const user_id = req.body.userID;
-  const size = user_id.length
-  try {
-    if (size === 1) {
-      let banUserRes = await chatClient.banUser(user_id[0], {
-        banned_by_id: admin,
-        reason: 'Unruly Behavior',
-      });
+  const { userIds } = req.body;
+
+  if (userIds.length) {
+    try {
+      await Promise.all(userIds.map(async (id) => {
+        return await chatClient.banUser(id, { banned_by_id: 'admin', reason: 'Breach of policy' });
+      }));
+      res.status(200).send(JSON.stringify({ payload: `Banned ${userIds.length} users.` }))
+    } catch (error) {
+      res.status(error.response.data.StatusCode).send(JSON.stringify({ payload: error.response.data.message }));
     }
-    else {
-      let newArray = user_id.map(function (element) {
-        chatClient.banUser(element, { banned_by_id: admin, reason: 'Unruly Behavior', });
-      });
-      console.log(newArray[0])
-    }
-    res.status(200).json({
-      payload: "Banned user(s) from all channels: " + user_id,
-    });
-  } catch (error) {
-    res.sendStatus(400);
-    res.status(401).send(`[ERROR]: ${error}`);
   }
 });
 
 router.route('/user/ban24').post(async (req, res) => {
-  const user_id = req.body.userID;
-  const size = user_id.length
-  try {
-    if (size === 1) {
-      let banUser24Res = await chatClient.banUser(user_id[0], {
-        banned_by_id: admin,
-        timeout: 24 * 60,
-        ip_ban: true,
-        reason: 'Please come back tomorrow',
-      });
+  const { userIds } = req.body;
+
+  if (userIds.length) {
+    try {
+      userIds.forEach(id => chatClient.banUser(id, { banned_by_id: 'admin', timeout: 24 * 60, ip_ban: true, reason: 'Breach of policy' }));
+      return res.status(200).send(JSON.stringify({ payload: `Banned ${userIds.length} users for 24 hours.` }))
+    } catch (error) {
+      return res.status(400).send(JSON.stringify({ payload: error }));
     }
-    else {
-      let newArray = user_id.map(function (element) {
-        chatClient.banUser(element, { banned_by_id: admin, timeout: 24 * 60, ip_ban: true, reason: 'Please come back tomorrow', });
-        console.log(element)
-      });
-      console.log(newArray[0])
-    }
-    res.status(200).json({
-      payload: "Banned user(s) from App for 24 hours: " + user_id,
-    });
-  } catch (error) {
-    res.status(401).send(`[ERROR]: ${error}`);
   }
+
+  return res.status(400).send(JSON.stringify({ payload: 'no messages selected' }))
 });
 
 router.route('/user/delete').post(async (req, res) => {
-  const user_id = req.body.userID;
-  const size = user_id.length
-  try {
-    if (size === 1) {
-      let deleteUserRes = await chatClient.deleteUser(user_id, {
-      });
+  const { userIds } = req.body;
+
+  if (userIds.length) {
+    try {
+      userIds.forEach(id => chatClient.deleteUser(id, {}));
+      return res.status(200).send(JSON.stringify({ payload: `Deleted ${userIds.length} Users.` }))
+    } catch (error) {
+      return res.status(400).send(JSON.stringify({ payload: error }));
     }
-    else {
-      let newArray = user_id.map(function (element) {
-        chatClient.deleteUser(element, {});
-      });
-    }
-    res.status(200).json({
-      payload: "Deleted user(s): " + user_id,
-    });
-  } catch (error) {
-    res.status(401).send(`[ERROR]: ${error}`);
   }
+  return res.status(400).send(JSON.stringify({ payload: 'no messages selected' }))
 });
 
 router.route('/user/deleteUserAndMessages').post(async (req, res) => {
-  const user_id = req.body.userID;
-  const size = user_id.length
-  try {
-    if (size === 1) {
-      let deleteUserAndAllMsgsRes = await chatClient.deleteUser(user_id, {
+  const { userIds } = req.body;
+  if (userIds.length) {
+    try {
+      userIds.forEach(id => chatClient.deleteUser(id, {
         delete_conversation_channels: true,
         mark_messages_deleted: true,
-        hard_delete: true,
-      });
+        hard_delete: true
+      }));
+      return res.status(200).send(JSON.stringify({ payload: `Deleted ${userIds.length} Users.` }))
+    } catch (error) {
+      return res.status(400).send(JSON.stringify({ payload: error }));
     }
-    else {
-      let newArray = user_id.map(function (element) {
-        chatClient.deleteUser(element, {
-          delete_conversation_channels: true,
-          mark_messages_deleted: true,
-          hard_delete: true,
-        });
-      });
-    }
-    res.status(200).json({
-      payload: "Deleted all user data and messages for user(s): " + user_id,
-    });
-  } catch (error) {
-    console.log(error)
-    res.status(401).send(`[ERROR]: ${error}`);
   }
+  return res.status(400).send(JSON.stringify({ payload: 'no messages selected' }))
 });
 
 // Message Actions
+
 router.route('/message/delete').post(async (req, res) => {
-  const message_body = req.body.messageID;
-  const size = message_body.length
-  const message_id = message_body[0].message.id
-  try {
-    if (size === 1) {
-      let deletedMsgRes = await chatClient.deleteMessage(message_id, true);
+  const { messages } = req.body;
+  const messageIds = messages.map(element => element.message.id);
+  if (messages.length) {
+    try {
+      messages.forEach(element => chatClient.deleteMessage(element.message.id, true));
+      return res.status(200).send(JSON.stringify({ payload: `Deleted ${messageIds.length} message(s): ${messageIds}` }));
+    } catch (error) {
+      return res.status(error.response.data.StatusCode).send(JSON.stringify({ payload: error }));
     }
-    else {
-      let newArray = message_id.map(function (element) {
-        chatClient.deleteMessage(element, true);
-      });
-    }
-    res.status(200).json({
-      payload: "Deleted message(s) with ID(s): " + message_id,
-    });
-  } catch (error) {
-    // const iEM2 = "DeleteMessage failed with error"
-    const iEM = "doesn't exist"
-    const APIErrorMessage = error.response.data.message
-    if (APIErrorMessage.indexOf(iEM) >= 0) { 
-        res.status(200).send('This message has already been deleted')
-        return
-     }
-    res.status(401).send(`[ERROR]: ${error}`);
-    
-    console.log(error.response.data.message)
   }
+  return res.status(400).send(JSON.stringify({ payload: 'no messages selected' }))
 });
 
+// not sure if unflagged endpoint actually works...
 router.route('/message/unflag').post((req, res) => {
+  const { messages } = req.body;
+  const messageIds = messages.map(element => element.message.id);
 
+  if (messages.length) {
+    try {
+      messages.forEach(element => chatClient.unflagMessage(element.message.id, { user_id: 'admin' }).then((res) => {
+        console.log(res);
+      }));
+      return res.status(200).send(JSON.stringify({ payload: `Unflagged ${messageIds.length} message(s): ${messageIds}` }));
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send(JSON.stringify({ payload: error }));
+    }
+  }
+  return res.status(400).send(JSON.stringify({ payload: 'no messages selected' }))
 });
 
 router.route('/sentiment').post((req, res) => {
